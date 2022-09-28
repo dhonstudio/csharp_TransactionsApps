@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace TransactionsApps
 {
@@ -81,8 +80,7 @@ namespace TransactionsApps
       }
     }
 
-    public void Read(string table)
-    {
+    private CsvConfiguration Configuration() {
       var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
       {
         HasHeaderRecord = false,
@@ -91,45 +89,12 @@ namespace TransactionsApps
         Delimiter = ";",
       };
 
-      using var streamReader = File.OpenText($"{table}.csv");
-      using var csvReader = new CsvReader(streamReader, csvConfig);
-
-      List<Transaksi> datas = new List<Transaksi>();
-      Transaksi data = new();
-      while (csvReader.Read())
-      {
-        data = new Transaksi()
-        {
-          ID = csvReader.GetField(0),
-          tanggal = csvReader.GetField(1),
-          keterangan = csvReader.GetField(2),
-          sebesar = csvReader.GetField(3)
-        };
-        datas.Add(data);
-      }
-
-      for (int i = 0; i < datas.Count; i++)
-      {
-        if (i == 0)
-        {
-          Console.WriteLine($"| {datas[i].ID} | {datas[i].tanggal} | {datas[i].keterangan} | {datas[i].sebesar} |");
-        } else
-        {
-          Console.WriteLine($"| {datas[i].ID} | {datas[i].tanggal} | {datas[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(datas[i].sebesar))} |");
-        }        
-      }      
+      return csvConfig;
     }
 
-    private static List<Transaksi> ReadDatas(string table)
+    public List<Transaksi> ReadDatas(string table)
     {
-      var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
-      {
-        HasHeaderRecord = false,
-        Comment = '#',
-        AllowComments = true,
-        Delimiter = ";",
-      };
-
+      var csvConfig = Configuration();
       using var streamReader = File.OpenText($"{table}.csv");
       using var csvReader = new CsvReader(streamReader, csvConfig);
 
@@ -151,16 +116,25 @@ namespace TransactionsApps
       return Datas;
     }
 
-    private static List<string> ReadIDs(string table)
+    public void Read(string table)
     {
-      var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
-      {
-        HasHeaderRecord = false,
-        Comment = '#',
-        AllowComments = true,
-        Delimiter = ";",
-      };
+      Datas = ReadDatas(table);
 
+      for (int i = 0; i < Datas.Count; i++)
+      {
+        if (i == 0)
+        {
+          Console.WriteLine($"| {Datas[i].ID} | {Datas[i].tanggal} | {Datas[i].keterangan} | {Datas[i].sebesar} |");
+        } else
+        {
+          Console.WriteLine($"| {Datas[i].ID} | {Datas[i].tanggal} | {Datas[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(Datas[i].sebesar))} |");
+        }        
+      }      
+    }
+
+    private List<string> ReadIDs(string table)
+    {
+      var csvConfig = Configuration();
       using var streamReader = File.OpenText($"{table}.csv");
       using var csvReader = new CsvReader(streamReader, csvConfig);
 
