@@ -1,42 +1,34 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using System;
-using System.Globalization;
+﻿using System;
 using System.IO;
-using System.Linq;
 
 namespace TransactionsApps
 {
-  public class Pembelian
-  {
-    public DateTime tanggal { get; set; }
-  }
-
   class Program
   {
-    public string menu, command;
+    private readonly TransaksiCRUDRepository transaksiCRUDRepository = new();
+    private string menu, command;
 
     static void Main(string[] args)
     {
-      Program p = new Program();
+      Program p = new();
       if (!File.Exists("pembelian.csv"))
       {
-        p.createCsv();
+        CreateCsv();
       }
 
       while (p.menu != "exit" && p.command != "exit" )
       {
         if (p.command == "" || p.command == null || p.command == "menu")
         {
-          p.initMenu();
+          p.InitMenu();
         } else
         {
-          p.initCommand();
+          p.InitCommand();
         }
       }     
     }
 
-    public async void createCsv()
+    private static async void CreateCsv()
     {
       string[] pembelianHeader =
         {
@@ -53,24 +45,24 @@ namespace TransactionsApps
       await File.WriteAllLinesAsync("penjualan.csv", penjualanHeader);
     }
 
-    public void initMenu()
+    private void InitMenu()
     {
       Console.Write("\nMenu (pembelian|penjualan|exit): ");
       menu = Console.ReadLine();
       if (menu == "pembelian" || menu == "penjualan")
       {
-        initCommand();
+        InitCommand();
       } else if (menu == "exit")
       {
 
       } else
       {
         Console.Write("\nMenu tidak tersedia. Silahkan coba kembali.\n");
-        initMenu();
+        InitMenu();
       }
     }
 
-    public void initCommand()
+    private void InitCommand()
     {
       Console.Write($"\nPerintah pada menu {menu} (create|read|update|delete|menu|exit): ");
       command = Console.ReadLine();
@@ -79,14 +71,14 @@ namespace TransactionsApps
         Console.Write("\n");
         switch (command)
         {
-          case "read":
-            read(menu);
-            break;
           case "create":
-            create(menu);
+            transaksiCRUDRepository.Create(menu);
             break;
+          case "read":
+            transaksiCRUDRepository.Read(menu);
+            break;          
           case "update":
-            update(menu);
+            transaksiCRUDRepository.Update(menu);
             break;
           default:
             break;
@@ -99,94 +91,7 @@ namespace TransactionsApps
       else
       {
         Console.Write("\nPerintah tidak tersedia. Silahkan coba kembali.\n");
-        initCommand();
-      }
-    }
-
-    public void read(string table)
-    {
-      var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
-      {
-        HasHeaderRecord = false,
-        Comment = '#',
-        AllowComments = true,
-        Delimiter = ";",
-      };
-
-      using var streamReader = File.OpenText($"{table}.csv");
-      using var csvReader = new CsvReader(streamReader, csvConfig);
-
-      while (csvReader.Read())
-      {
-        var ID = csvReader.GetField(0);
-        var tanggal = csvReader.GetField(1);
-        var keterangan = csvReader.GetField(2);
-        var sebesar = csvReader.GetField(3);
-
-        Console.WriteLine($"| {ID} | {tanggal} | {keterangan} | {sebesar}");
-      }
-    }
-
-    public string readID(string table)
-    {
-      string streamReader = File.ReadLines($"{table}.csv").Last();
-      string ID = streamReader.Split(";")[0];
-      return ID;
-    }
-
-    public string keterangan;
-    public int sebesar;
-
-    public void create(string table)
-    {
-      Console.Write($"Keterangan {table} (maksimal 50 karakter): ");
-      keterangan = Console.ReadLine();
-
-      if (keterangan.Length <= 50)
-      {
-        createSebesar(table);
-      } else
-      {
-        Console.Write($"\nKeterangan {table} tidak boleh melebihi 50 karakter.\n");
-        create(table);
-      }
-    }
-
-    public void createSebesar(string table)
-    {
-      Console.Write($"\nSebesar (harus angka dan lebih dari 0): ");
-
-      if (int.TryParse(Console.ReadLine(), out sebesar))
-      {
-        int ID = Convert.ToInt32(readID(table)) + 1;
-        string tanggal = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");        
-        string row = $"{ID}; {tanggal}; {keterangan}; {sebesar}\n";
-
-        File.AppendAllText($"{table}.csv", row);
-
-        Console.WriteLine("\nPencatatan berhasil disimpan.\n");
-        read(table);
-      }
-      else
-      {
-        Console.Write($"\nSebesar tidak valid atau bernilai 0. silahkan coba kembali\n");
-        createSebesar(table);
-      }
-    }
-
-    public void update(string table)
-    {
-      Console.Write($"Keterangan {table} (maksimal 50 karakter): ");
-      keterangan = Console.ReadLine();
-
-      if (keterangan.Length <= 50)
-      {
-        createSebesar(table);
-      }
-      else
-      {
-        Console.Write($"\nKeterangan {table} tidak boleh melebihi 50 karakter.\n");
-        create(table);
+        InitCommand();
       }
     }
   }
