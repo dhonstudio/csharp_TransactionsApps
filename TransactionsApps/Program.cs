@@ -32,14 +32,14 @@ namespace TransactionsApps
     {
       string[] pembelianHeader =
         {
-            "ID; Tanggal; Keterangan Pembelian; Sebesar"
+            "ID;Tanggal;Keterangan Pembelian;Sebesar"
         };
 
       await File.WriteAllLinesAsync("pembelian.csv", pembelianHeader);
 
       string[] penjualanHeader =
         {
-            "ID; Tanggal; Keterangan Penjualan; Sebesar"
+            "ID;Tanggal;Keterangan Penjualan;Sebesar"
         };
 
       await File.WriteAllLinesAsync("penjualan.csv", penjualanHeader);
@@ -79,6 +79,9 @@ namespace TransactionsApps
             break;          
           case "update":
             transaksiCRUDRepository.Update(menu);
+            break;
+          case "delete":
+            transaksiCRUDRepository.Delete(menu);
             break;
           default:
             break;

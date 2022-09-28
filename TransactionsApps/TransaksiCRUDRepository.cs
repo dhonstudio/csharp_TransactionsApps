@@ -61,7 +61,7 @@ namespace TransactionsApps
         {
           ID = (ReadID(table) + 1).ToString();
           string tanggal = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss");
-          string row = $"{ID}; {tanggal}; {keterangan}; {sebesar}\n";
+          string row = $"{ID};{tanggal};{keterangan};{sebesar}\n";
 
           File.AppendAllText($"{table}.csv", row);
 
@@ -94,15 +94,30 @@ namespace TransactionsApps
       using var streamReader = File.OpenText($"{table}.csv");
       using var csvReader = new CsvReader(streamReader, csvConfig);
 
+      List<Transaksi> datas = new List<Transaksi>();
+      Transaksi data = new();
       while (csvReader.Read())
       {
-        var ID = csvReader.GetField(0);
-        var tanggal = csvReader.GetField(1);
-        var keterangan = csvReader.GetField(2);
-        var sebesar = csvReader.GetField(3);
-
-        Console.WriteLine($"| {ID} | {tanggal} | {keterangan} | {sebesar} |");
+        data = new Transaksi()
+        {
+          ID = csvReader.GetField(0),
+          tanggal = csvReader.GetField(1),
+          keterangan = csvReader.GetField(2),
+          sebesar = csvReader.GetField(3)
+        };
+        datas.Add(data);
       }
+
+      for (int i = 0; i < datas.Count; i++)
+      {
+        if (i == 0)
+        {
+          Console.WriteLine($"| {datas[i].ID} | {datas[i].tanggal} | {datas[i].keterangan} | {datas[i].sebesar} |");
+        } else
+        {
+          Console.WriteLine($"| {datas[i].ID} | {datas[i].tanggal} | {datas[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(datas[i].sebesar))} |");
+        }        
+      }      
     }
 
     private static List<Transaksi> ReadDatas(string table)
@@ -201,7 +216,7 @@ namespace TransactionsApps
       }
     }
 
-    private async Task UpdateSebesarAsync(string table)
+    private void UpdateSebesarAsync(string table)
     {
       Console.Write($"\nSebesar (kosongkan apabila tidak ingin diubah): ");
       var sebesarInput = Console.ReadLine();
@@ -221,15 +236,15 @@ namespace TransactionsApps
           {
             if (i == index)
             {
-              rows.Add($"{Datas[i].ID}; {tanggal}; {keterangan}; {sebesarInput}\n");              
+              rows.Add($"{Datas[i].ID};{tanggal};{keterangan};{sebesarInput}");              
             }
             else
             {
-              rows.Add($"{Datas[i].ID}; {Datas[i].tanggal}; {Datas[i].keterangan}; {Datas[i].sebesar}\n");
+              rows.Add($"{Datas[i].ID};{Datas[i].tanggal};{Datas[i].keterangan};{Datas[i].sebesar}");
             }
           }
 
-          await File.WriteAllLinesAsync($"{table}.csv", rows.ToArray());
+          File.WriteAllLines($"{table}.csv", rows.ToArray());
 
           Console.WriteLine("\nPencatatan berhasil diubah.\n");
           Read(table);
@@ -244,6 +259,38 @@ namespace TransactionsApps
       {
         Console.Write($"\nSebesar tidak valid. silahkan coba kembali\n");
         UpdateSebesarAsync(table);
+      }
+    }
+
+    public void Delete(string table)
+    {
+      Console.Write($"ID yang akan dihapus: ");
+      ID = Console.ReadLine();
+
+      var IDs = ReadIDs(table);
+
+      if (IDs.Contains(ID))
+      {
+        Datas = ReadDatas(table);
+        index = Datas.FindIndex(x => x.ID == ID);
+        List<string> rows = new List<string>();
+        for (int i = 0; i < Datas.Count; i++)
+        {
+          if (i != index)
+          {
+            rows.Add($"{Datas[i].ID};{Datas[i].tanggal};{Datas[i].keterangan};{Datas[i].sebesar}");
+          }
+        }
+
+        File.WriteAllLines($"{table}.csv", rows.ToArray());
+
+        Console.WriteLine($"\nID {ID} berhasil dihapus.\n");
+        Read(table);
+      }
+      else
+      {
+        Console.Write($"\nID tidak ditemukan.\n\n");
+        Update(table);
       }
     }
   }
