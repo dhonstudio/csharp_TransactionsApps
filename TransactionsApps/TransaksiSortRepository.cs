@@ -4,19 +4,6 @@ using System.Linq;
 
 namespace TransactionsApps
 {
-  class GFG : IComparer<int>
-  {
-    public int Compare(int x, int y)
-    {
-      if (x == 0 || y == 0)
-      {
-        return 0;
-      }
-
-      return x.CompareTo(y);
-    }
-  }
-
   class TransaksiSortRepository
   {
     private List<Transaksi> Datas;

@@ -7,6 +7,7 @@ namespace TransactionsApps
   {
     private readonly TransaksiCRUDRepository transaksiCRUDRepository = new();
     private readonly TransaksiSortRepository transaksiSortRepository = new();
+    private readonly TransaksiSearchRepository transaksiSearchRepository = new();
     private string menu, command;
 
     static void Main(string[] args)
@@ -65,9 +66,9 @@ namespace TransactionsApps
 
     private void InitCommand()
     {
-      Console.Write($"\nPerintah pada menu {menu} (create|read|update|delete|sort|menu|exit): ");
+      Console.Write($"\nPerintah pada menu {menu} (create|read|update|delete|sort|search|menu|exit): ");
       command = Console.ReadLine();
-      if (command == "create" || command == "read" || command == "update" || command == "delete"|| command == "sort")
+      if (command == "create" || command == "read" || command == "update" || command == "delete" || command == "sort" || command == "search")
       {
         Console.Write("\n");
         switch (command)
@@ -87,6 +88,9 @@ namespace TransactionsApps
 
           case "sort":
             transaksiSortRepository.Sort(menu);
+            break;
+          case "search":
+            transaksiSearchRepository.Search(menu);
             break;
           default:
             break;
