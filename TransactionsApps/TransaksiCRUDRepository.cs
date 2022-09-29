@@ -320,11 +320,18 @@ namespace TransactionsApps
         }
       }
 
+      string[] reportHeader =
+        {
+            "ID;Tanggal;Keterangan;Debet;Kredit;Saldo Laba"
+        };
+
       Console.WriteLine($"\n| ID | Tanggal | Keterangan | Debet | Kredit | Saldo Laba |");
+      File.WriteAllLines("report.csv", reportHeader);
 
       for (int i = 0; i < finalReports.Count; i++)
       {
-        Console.WriteLine($"| {finalReports[i].ID} | {finalReports[i].tanggal} | {finalReports[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].debet))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].kredit))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].laba))}");
+        Console.WriteLine($"| {finalReports[i].ID} | {finalReports[i].tanggal} | {finalReports[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].debet))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].kredit))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].laba))} |");
+        File.AppendAllText("report.csv", $"{finalReports[i].ID};{finalReports[i].tanggal};{finalReports[i].keterangan};{string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].debet))};{string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].kredit))};{string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].laba))}\n");
       }
     }
   }
