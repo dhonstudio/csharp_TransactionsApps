@@ -34,14 +34,20 @@ namespace TransactionsApps
     {
       string[] pembelianHeader =
         {
-            "ID;Tanggal;Keterangan Pembelian;Sebesar"
+            "ID;Tanggal;Keterangan Pembelian;Sebesar",
+            "1;01-09-2022 07:01:28;Bahan Baku;10000000",
+            "2;01-09-2022 07:15:15;Bahan Pengemas;5000000",
+            "3;02-09-2022 08:11:34;Bahan Baku Tambahan;2000000"
         };
 
       await File.WriteAllLinesAsync("pembelian.csv", pembelianHeader);
 
       string[] penjualanHeader =
         {
-            "ID;Tanggal;Keterangan Penjualan;Sebesar"
+            "ID;Tanggal;Keterangan Penjualan;Sebesar",
+            "1;01-09-2022 13:01:28;Produk A;15000000",
+            "2;01-09-2022 13:14:36;Produk B;2000000",
+            "3;01-09-2022 15:17:50;Produk C;1000000"
         };
 
       await File.WriteAllLinesAsync("penjualan.csv", penjualanHeader);
