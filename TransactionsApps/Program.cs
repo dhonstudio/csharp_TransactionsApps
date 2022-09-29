@@ -49,11 +49,14 @@ namespace TransactionsApps
 
     private void InitMenu()
     {
-      Console.Write("\nMenu (pembelian|penjualan|exit): ");
+      Console.Write("\nMenu (pembelian|penjualan|report|exit): ");
       menu = Console.ReadLine();
       if (menu == "pembelian" || menu == "penjualan")
       {
         InitCommand();
+      } else if (menu == "report")
+      {
+        transaksiCRUDRepository.Report();
       } else if (menu == "exit")
       {
 
@@ -92,6 +95,7 @@ namespace TransactionsApps
           case "search":
             transaksiSearchRepository.Search(menu);
             break;
+          
           default:
             break;
         }

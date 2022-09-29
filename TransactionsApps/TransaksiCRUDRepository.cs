@@ -267,5 +267,65 @@ namespace TransactionsApps
         Update(table);
       }
     }
+
+    public void Report()
+    {
+      var DataPembelian = ReadDatas("pembelian");
+      var DataPenjualan = ReadDatas("penjualan");
+
+      var reports = new List<Report>();
+      var report = new Report();
+
+      for (int i = 1; i < DataPembelian.Count; i++)
+      {
+        report = new Report()
+        {
+          ID = "b" + DataPembelian[i].ID,
+          tanggal = DataPembelian[i].tanggal,
+          keterangan = DataPembelian[i].keterangan,
+          debet = 0.ToString(),
+          kredit = DataPembelian[i].sebesar
+        };
+        reports.Add(report);
+      }
+
+      for (int i = 1; i < DataPenjualan.Count; i++)
+      {
+        report = new Report()
+        {
+          ID = "a" + DataPenjualan[i].ID,
+          tanggal = DataPenjualan[i].tanggal,
+          keterangan = DataPenjualan[i].keterangan,
+          debet = DataPenjualan[i].sebesar,
+          kredit = 0.ToString()
+        };
+        reports.Add(report);
+      }
+
+      reports = reports.OrderBy(q => q.tanggal).ToList();
+
+      var finalReports = new List<Report>();
+      var finalReport = new Report();
+
+      for (int i = 0; i < reports.Count; i++)
+      {
+        finalReport = reports[i];
+        if (i == 0) {          
+          finalReport.laba = (Convert.ToInt32(reports[i].debet) - Convert.ToInt32(reports[i].kredit)).ToString();
+          finalReports.Add(finalReport);
+        } else
+        {
+          finalReport.laba = (Convert.ToInt32(finalReports.Last().laba) + Convert.ToInt32(reports[i].debet) - Convert.ToInt32(reports[i].kredit)).ToString();
+          finalReports.Add(finalReport);
+        }
+      }
+
+      Console.WriteLine($"\n| ID | Tanggal | Keterangan | Debet | Kredit | Saldo Laba |");
+
+      for (int i = 0; i < finalReports.Count; i++)
+      {
+        Console.WriteLine($"| {finalReports[i].ID} | {finalReports[i].tanggal} | {finalReports[i].keterangan} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].debet))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].kredit))} | {string.Format("{0:#,0}", Convert.ToInt32(finalReports[i].laba))}");
+      }
+    }
   }
 }
